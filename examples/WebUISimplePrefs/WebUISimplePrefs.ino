@@ -1,0 +1,1 @@
+// Placeholder for full web UI example

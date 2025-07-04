@@ -1,0 +1,19 @@
+name: Arduino CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: arduino/setup-arduino-cli@v1
+      with:
+        version: latest
+    - run: arduino-cli core update-index
+    - run: arduino-cli core install esp8266:esp8266
+    - run: arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 examples/SimplePrefsBasic/SimplePrefsBasic.ino
