@@ -9,24 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Arduino CLI
-        uses: arduino/setup-arduino-cli@v1
-        with:
-          version: 0.35.3
-
-      - name: Update core index
+      - name: Install Arduino CLI Manually
         run: |
+          curl -fsSL https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz | tar xz
+          sudo mv arduino-cli /usr/local/bin/arduino-cli
+
+      - name: Configure Arduino CLI
+        run: |
+          arduino-cli config init
           arduino-cli core update-index
-
-      - name: Install ESP8266 and ESP32 cores
-        run: |
           arduino-cli core install esp8266:esp8266
           arduino-cli core install esp32:esp32
 
-      - name: Install required libraries
+      - name: Install Libraries
         run: |
           arduino-cli lib install "ESP8266WiFi"
           arduino-cli lib install "ESP8266WebServer"
