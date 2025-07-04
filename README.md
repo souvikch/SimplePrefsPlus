@@ -1,46 +1,46 @@
 # SimplePrefsPlus
 
-**SimplePrefsPlus** is a lightweight Arduino-compatible library for ESP8266 and ESP32 that provides encrypted key-value configuration storage using AES-128. It supports both Preferences (ESP32) and LittleFS (ESP8266) backends and can optionally expose a Web UI for first-time setup.
+**Encrypted key-value configuration storage for ESP8266 and ESP32.**
 
 ---
 
-## ✨ Features
+## 🚀 Features
 
-- 🔐 AES-128 encryption using TinyAES
-- ⚙️ Stores config in Preferences (ESP32) or LittleFS (ESP8266)
-- 🌐 Optional Web UI to enter and store encryption key
-- 🧠 Auto-reset and reconfigure on key decode failure
-- 🧩 Easy to extend for new data types or storage
-- 🧵 Lightweight and non-blocking for most operations
-
----
-
-## 📦 Installation
-
-Copy the library to your Arduino `libraries/` folder or use PlatformIO.
+- 🔐 AES-128 CBC encryption for secure storage
+- 📦 Stores config values (strings, ints, floats) with auto-type detection
+- 🧠 Supports ESP32 `Preferences` or ESP8266 `LittleFS` backend
+- 🔄 Automatically enters setup mode if key is missing or corrupted
+- 🌐 Web UI for remote config (optional)
+- 🧪 Lightweight: optimized for embedded flash + RAM
+- ✅ Works with both **ESP32** and **ESP8266**
 
 ---
 
-## 📚 Basic Usage
+## 🔧 Installation
 
-### ESP8266
+1. Clone or download this repository
+2. Open Arduino IDE
+3. Select **Sketch > Include Library > Add .ZIP Library...**
+4. Choose this repo's root folder or ZIP
+
+---
+
+## 🔰 Basic Usage
 
 ```cpp
-#include <LittleFS.h>
-#include "SimplePrefsPlus.h"
-#include "storage/LittleFSStorageESP8266.h"
+#include <SimplePrefsPlus.h>
 
-LittleFSStorageESP8266 storage("/config.dat");
-SimplePrefsPlus prefs(&storage);
+SimplePrefsPlus prefs("config");
 
 void setup() {
   Serial.begin(115200);
+  if (!prefs.loadKey()) {
+    prefs.setupKeyFromSerial(); // prompt user to enter 16-char key
+  }
   prefs.begin();
 
-  if (!prefs.loadKey()) {
-    prefs.storeKeyFromString("00112233445566778899aabbccddeeff");
-  }
+  prefs.putString("ssid", "MyWiFi");
+  prefs.putInt("port", 8080);
 
-  prefs.write("ssid", "MyWiFi");
-  Serial.println(prefs.read("ssid"));
-}
+  Serial.println(prefs.getString("ssid"));
+  Serial.println(prefs.getInt
