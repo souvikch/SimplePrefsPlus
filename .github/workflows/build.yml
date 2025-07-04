@@ -18,11 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-  - name: Install Arduino CLI manually
-  run: |
-    curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-    echo "$HOME/.arduino15/bin" >> $GITHUB_PATH
-
+      - name: Install Arduino CLI manually
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          echo "$HOME/.arduino15/bin" >> $GITHUB_PATH
 
       - name: Update core index
         run: arduino-cli core update-index
@@ -32,7 +31,7 @@ jobs:
           arduino-cli core install esp8266:esp8266
           arduino-cli core install esp32:esp32
 
-      - name: Install dependencies
+      - name: Install library dependencies
         run: |
           arduino-cli lib install ESP8266WiFi
           arduino-cli lib install ESP8266WebServer
