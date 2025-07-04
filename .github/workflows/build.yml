@@ -2,52 +2,54 @@ name: Build Examples
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        board:
-          - id: esp8266:esp8266:nodemcuv2
-            keyword: ESP8266
-          - id: esp32:esp32:esp32dev
-            keyword: ESP32
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Arduino CLI manually
-        run: |
-          curl -fsSL https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz | tar -xz
-          sudo mv arduino-cli /usr/local/bin
-          arduino-cli version
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+        with:
+          version: 0.35.3
 
-      - name: Initialize config and add board URLs
+      - name: Install ESP8266 Core
         run: |
           arduino-cli config init
-          arduino-cli config add board_manager.additional_urls \
-            https://arduino.esp8266.com/stable/package_esp8266com_index.json \
-            https://espressif.github.io/arduino-esp32/package_esp32_index.json
-
-      - name: Update core index
-        run: arduino-cli core update-index
-
-      - name: Install platforms
-        run: |
+          arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com/stable/package_esp8266com_index.json
+          arduino-cli core update-index
           arduino-cli core install esp8266:esp8266
+
+      - name: Install ESP32 Core
+        run: |
+          arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core update-index
           arduino-cli core install esp32:esp32
 
-      - name: Compile compatible examples only
+      - name: Compile examples for ESP8266
         run: |
           for sketch in $(find examples -name '*.ino'); do
-            if [[ "$sketch" == *"${{ matrix.board.keyword }}"* ]] || [[ "$sketch" != *ESP8266* && "$sketch" != *ESP32* ]]; then
-              echo "🔧 Compiling $sketch for ${{ matrix.board.id }}"
-              arduino-cli compile --fqbn ${{ matrix.board.id }} "$sketch"
+            if [[ "$sketch" == *"ESP8266"* ]] || [[ "$sketch" != *ESP32* ]]; then
+              echo "🔧 Compiling $sketch for esp8266:esp8266:nodemcuv2"
+              arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 "$sketch"
             else
-              echo "⚠️  Skipping $sketch for ${{ matrix.board.id }} (not compatible)"
+              echo "⚠️  Skipping $sketch for ESP8266 (ESP32-specific)"
+            fi
+          done
+
+      - name: Compile examples for ESP32
+        run: |
+          for sketch in $(find examples -name '*.ino'); do
+            if [[ "$sketch" == *"ESP32"* ]] || [[ "$sketch" != *ESP8266* ]]; then
+              echo "🔧 Compiling $sketch for esp32:esp32:esp32dev"
+              arduino-cli compile --fqbn esp32:esp32:esp32dev "$sketch"
+            else
+              echo "⚠️  Skipping $sketch for ESP32 (ESP8266-specific)"
             fi
           done
