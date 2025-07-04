@@ -1,12 +1,10 @@
-name: Arduino Build
+name: Arduino Library CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
@@ -16,28 +14,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Arduino CLI manually
-        run: |
-          curl -fsSL https://downloads.arduino.cc/arduino-cli/arduino-cli_latest_Linux_64bit.tar.gz | tar -xz
-          sudo mv arduino-cli /usr/local/bin/
-          arduino-cli version
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+        with:
+          version: 0.35.3
 
-      - name: Configure Arduino CLI and Install Cores
+      - name: Initialize Arduino CLI
         run: |
           arduino-cli config init
-          arduino-cli config add board_manager.additional_urls \
-            https://arduino.esp8266.com/stable/package_esp8266com_index.json \
-            https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
           arduino-cli core update-index
           arduino-cli core install esp8266:esp8266
           arduino-cli core install esp32:esp32
+
+      - name: Install required libraries
+        run: |
+          arduino-cli lib install "ESP8266WiFi"
+          arduino-cli lib install "ESP8266WebServer"
 
       - name: Compile Examples for ESP8266
         run: |
           for sketch in $(find examples -name '*.ino'); do
             if [[ "$sketch" == *"ESP8266"* || "$sketch" != *"ESP32"* ]]; then
               echo "🔧 Compiling $sketch for esp8266:esp8266:nodemcuv2"
-              arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 "$sketch"
+              arduino-cli compile \
+                --fqbn esp8266:esp8266:nodemcuv2 \
+                --library "$GITHUB_WORKSPACE" \
+                "$sketch"
             else
               echo "⚠️ Skipping $sketch for esp8266"
             fi
@@ -48,7 +50,10 @@ jobs:
           for sketch in $(find examples -name '*.ino'); do
             if [[ "$sketch" == *"ESP32"* || "$sketch" != *"ESP8266"* ]]; then
               echo "🔧 Compiling $sketch for esp32:esp32:esp32dev"
-              arduino-cli compile --fqbn esp32:esp32:esp32dev "$sketch"
+              arduino-cli compile \
+                --fqbn esp32:esp32:esp32dev \
+                --library "$GITHUB_WORKSPACE" \
+                "$sketch"
             else
               echo "⚠️ Skipping $sketch for esp32"
             fi
