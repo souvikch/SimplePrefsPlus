@@ -1,17 +1,31 @@
-#include <Preferences.h>
-#include "SimplePrefsPlus.h"
-#include "storage/PrefsStorageESP32.h"
+#include <SimplePrefsPlus.h>
 
-PrefsStorageESP32 storage("config");
-SimplePrefsPlus prefs(&storage);
+SimplePrefsPlus prefs("config");
 
 void setup() {
   Serial.begin(115200);
-  prefs.begin();
+  delay(1000);
+
   if (!prefs.loadKey()) {
-    prefs.storeKeyFromString("00112233445566778899aabbccddeeff");
+    Serial.println("AES key not found or invalid. Setup required.");
+    while (true); // Stop here, simulate blocking setup screen
   }
-  prefs.write("ssid", "myESP32SSID");
-  Serial.println(prefs.read("ssid"));
+
+  prefs.begin();
+  prefs.putString("username", "souvik");
+  prefs.putInt("userid", 42);
+  prefs.end();
+
+  prefs.begin();
+  String username = prefs.getString("username", "none");
+  int userid = prefs.getInt("userid", -1);
+  prefs.end();
+
+  Serial.println("Read back:");
+  Serial.println("username = " + username);
+  Serial.println("userid = " + String(userid));
 }
-void loop() {}
+
+void loop() {
+  // Nothing here
+}
