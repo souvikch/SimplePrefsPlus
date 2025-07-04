@@ -24,10 +24,7 @@ jobs:
           sudo mv arduino-cli /usr/local/bin
           arduino-cli version
 
-      - name: Update core index
-        run: arduino-cli core update-index
-
-            - name: Add board URLs
+      - name: Initialize Arduino CLI config and add board URLs
         run: |
           arduino-cli config init
           arduino-cli config add board_manager.additional_urls \
@@ -38,7 +35,6 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install esp8266:esp8266
           arduino-cli core install esp32:esp32
-
 
       - name: Install library dependencies
         run: |
