@@ -1,31 +1,29 @@
 # SimplePrefsPlus
 
-**Encrypted key-value configuration storage for ESP8266 and ESP32.**
+`SimplePrefsPlus` is an easy-to-use, secure, and lightweight preferences storage library for **ESP8266** and **ESP32** microcontrollers. It wraps around `Preferences` (ESP32) or `LittleFS` (ESP8266) and adds **AES-128 encryption**, automatic key setup, and optional Web UI for configuration.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- 🔐 AES-128 CBC encryption for secure storage
-- 📦 Stores config values (strings, ints, floats) with auto-type detection
-- 🧠 Supports ESP32 `Preferences` or ESP8266 `LittleFS` backend
-- 🔄 Automatically enters setup mode if key is missing or corrupted
-- 🌐 Web UI for remote config (optional)
-- 🧪 Lightweight: optimized for embedded flash + RAM
-- ✅ Works with both **ESP32** and **ESP8266**
-
----
-
-## 🔧 Installation
-
-1. Clone or download this repository
-2. Open Arduino IDE
-3. Select **Sketch > Include Library > Add .ZIP Library...**
-4. Choose this repo's root folder or ZIP
+- 🔐 AES-128 CBC encryption of stored key-value pairs.
+- 🔄 Automatically enters setup mode if no key or invalid key is found.
+- 📦 Compact and portable with minimal RAM/Flash usage.
+- 🧠 Uniform API for ESP8266 and ESP32.
+- 🌐 Optional Web UI interface for initial key provisioning.
+- ✅ Works with strings, ints, floats, bools, etc.
+- 💾 Uses Preferences on ESP32 and LittleFS on ESP8266.
 
 ---
 
-## 🔰 Basic Usage
+## 📦 Installation
+
+- Place the library folder in your Arduino `libraries/` directory.
+- Ensure you have the latest ESP8266/ESP32 board support installed.
+
+---
+
+## 🔧 Basic Usage
 
 ```cpp
 #include <SimplePrefsPlus.h>
@@ -34,13 +32,19 @@ SimplePrefsPlus prefs("config");
 
 void setup() {
   Serial.begin(115200);
+  
   if (!prefs.loadKey()) {
-    prefs.setupKeyFromSerial(); // prompt user to enter 16-char key
+    Serial.println("No valid key found. Setup required.");
+    while (true); // Block here for setup
   }
+
   prefs.begin();
-
   prefs.putString("ssid", "MyWiFi");
-  prefs.putInt("port", 8080);
+  prefs.putInt("boots", 5);
+  prefs.end();
 
-  Serial.println(prefs.getString("ssid"));
-  Serial.println(prefs.getInt
+  prefs.begin();
+  String ssid = prefs.getString("ssid", "none");
+  int boots = prefs.getInt("boots", -1);
+  prefs.end();
+}
