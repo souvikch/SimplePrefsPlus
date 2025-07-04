@@ -2,16 +2,15 @@ name: Build Examples
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Arduino CLI
@@ -32,24 +31,24 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install esp32:esp32
 
-      - name: Compile examples for ESP8266
+      - name: Compile ESP8266 Examples
         run: |
           for sketch in $(find examples -name '*.ino'); do
-            if [[ "$sketch" == *"ESP8266"* ]] || [[ "$sketch" != *ESP32* ]]; then
+            if [[ "$sketch" == *"ESP8266"* || "$sketch" != *"ESP32"* ]]; then
               echo "🔧 Compiling $sketch for esp8266:esp8266:nodemcuv2"
               arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 "$sketch"
             else
-              echo "⚠️  Skipping $sketch for ESP8266 (ESP32-specific)"
+              echo "⚠️ Skipping $sketch for esp8266"
             fi
           done
 
-      - name: Compile examples for ESP32
+      - name: Compile ESP32 Examples
         run: |
           for sketch in $(find examples -name '*.ino'); do
-            if [[ "$sketch" == *"ESP32"* ]] || [[ "$sketch" != *ESP8266* ]]; then
-              echo "🔧 Compiling $sketch for esp32:esp32:esp32dev"
-              arduino-cli compile --fqbn esp32:esp32:esp32dev "$sketch"
+            if [[ "$sketch" == *"ESP32"* || "$sketch" != *"ESP8266"* ]]; then
+              echo "🔧 Compiling $sketch for esp32:esp32:esp32doit-devkit-v1"
+              arduino-cli compile --fqbn esp32:esp32:esp32doit-devkit-v1 "$sketch"
             else
-              echo "⚠️  Skipping $sketch for ESP32 (ESP8266-specific)"
+              echo "⚠️ Skipping $sketch for esp32"
             fi
           done
