@@ -1,0 +1,39 @@
+#######################################
+# Syntax Coloring Map For SimplePrefsPlus
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+SimplePrefsPlus	KEYWORD1
+AES128	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+end	KEYWORD2
+putString	KEYWORD2
+getString	KEYWORD2
+putInt	KEYWORD2
+getInt	KEYWORD2
+putFloat	KEYWORD2
+getFloat	KEYWORD2
+putBool	KEYWORD2
+getBool	KEYWORD2
+remove	KEYWORD2
+clear	KEYWORD2
+loadKey	KEYWORD2
+storeKeyFromString	KEYWORD2
+getWebUI	KEYWORD2
+setDebug	KEYWORD2
+setNamespace	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+true	LITERAL1
+false	LITERAL1
