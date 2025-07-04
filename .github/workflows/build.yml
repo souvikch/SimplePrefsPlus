@@ -15,22 +15,13 @@ jobs:
           - esp32:esp32:esp32dev
 
     steps:
-<<<<<<< HEAD
-    - uses: actions/checkout@v3
-    - uses: arduino/setup-arduino-cli@v1
-      with:
-        version: 0.35.3
-    - run: arduino-cli core update-index
-    - run: arduino-cli core install esp8266:esp8266
-    - run: arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 examples/SimplePrefsBasic/SimplePrefsBasic.ino
-=======
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Arduino CLI
         uses: arduino/setup-arduino-cli@v1
         with:
-          version: 0.35.3
+          version: latest
 
       - name: Update core index
         run: arduino-cli core update-index
@@ -51,4 +42,3 @@ jobs:
             echo "🔧 Compiling $sketch for ${{ matrix.board }}"
             arduino-cli compile --fqbn ${{ matrix.board }} "$sketch"
           done
->>>>>>> f1843825e8d5453d21aae5a064c9372f8f49ecd0
